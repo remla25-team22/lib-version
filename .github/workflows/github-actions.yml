@@ -1,12 +1,28 @@
-name: Publish to GitHub Packages
+name: Test & Publish to GitHub Packages
 
 on:
   push:
     branches:
       - main
-      - setup-basics
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore lib-version/lib-version.csproj
+
+      - name: Run tests
+        run: dotnet test lib-version/lib-version.csproj --configuration Release
+
   publish:
     runs-on: ubuntu-latest
 
