@@ -1,0 +1,21 @@
+name: Publish to GitHub Packages
+
+on:
+  push:
+    branches:
+      - main
+      - setup-basics
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+          
+      - name: Publish NuGet package to GitHub Packages
+        uses: brandedoutcast/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: lib-version/lib-version.csproj
+          NUGET_KEY: ${{ secrets.GITHUB_TOKEN }}
+          NUGET_SOURCE: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
