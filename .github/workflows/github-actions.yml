@@ -9,13 +9,23 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-          
-      - name: Publish NuGet package to GitHub Packages
-        uses: rollycodes/publish-nuget-private@v3.0.1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          PROJECT_FILE_PATH: lib-version/lib-version.csproj
-          NUGET_KEY: ${{ secrets.GITHUB_TOKEN }}
-          NUGET_SOURCE: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          dotnet-version: '8.0.x'
+
+      - name: Build & Pack
+        run: |
+          dotnet restore lib-version/lib-version.csproj
+          dotnet build lib-version/lib-version.csproj --configuration Release
+          dotnet pack lib-version/lib-version.csproj --configuration Release --output out
+
+      - name: Push to GitHub Packages
+        run: |
+          dotnet nuget push "out/*.nupkg" \
+            --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            --api-key "${{ secrets.GITHUB_TOKEN }}" \
+            --skip-duplicate
