@@ -1,9 +1,6 @@
-﻿using System.Reflection;
+﻿namespace lib_version;
 
-namespace lib_version
+public static class VersionUtil
 {
-    public class VersionUtil
-    {
-        public Version? CurrentVersion { get; } = typeof(VersionUtil).Assembly.GetName().Version;
-    }
+    public static Version? CurrentVersion { get; } = typeof(VersionUtil).Assembly.GetName().Version;
 }
