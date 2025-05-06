@@ -18,4 +18,4 @@ jobs:
         with:
           PROJECT_FILE_PATH: lib-version/lib-version.csproj
           NUGET_KEY: ${{ secrets.GITHUB_TOKEN }}
-          NUGET_SOURCE: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          NUGET_SOURCE: https://nuget.pkg.github.com/${{ github.repository_owner }}
