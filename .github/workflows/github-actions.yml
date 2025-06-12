@@ -36,6 +36,10 @@ jobs:
         id: version
         run: |
           VERSION=$(cat VERSION.txt)
+          if [[ -z "$VERSION" ]]; then
+            echo "VERSION.txt is empty. Aborting."
+            exit 1
+          fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Current version: $VERSION"
 
@@ -49,11 +53,9 @@ jobs:
           git push origin ${{ env.VERSION }}
 
       - name: Publish NuGet package to GitHub Packages
-        uses: rollycodes/publish-nuget-private@v3.0.1
-        with:
-          PROJECT_FILE_PATH: lib-version/lib-version.csproj
-          NUGET_KEY: ${{ secrets.GITHUB_TOKEN }}
-          NUGET_SOURCE: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        run: |
+          dotnet pack lib-version/lib-version.csproj --no-build --configuration Release -p:Version=${{ env.VERSION }} --output .
+          dotnet nuget push *.nupkg --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate --no-symbols
 
       - name: Bump to next patch pre-release version
         run: |
@@ -68,4 +70,4 @@ jobs:
         run: |
           git add VERSION.txt
           git commit -m "Bump version to ${{ env.NEXT_VERSION }} after release ${{ env.VERSION }}"
-          git push origin main
+          git push origin main || echo "Push to main failed. Check if branch protection blocks direct commits."
