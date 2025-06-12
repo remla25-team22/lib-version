@@ -56,7 +56,7 @@ jobs:
 
       - name: Publish NuGet package to GitHub Packages
         run: |
-          dotnet pack lib-version/lib-version.csproj --no-build --configuration Release -p:Version=${{ env.VERSION_CLEANED }} --output .
+          dotnet pack lib-version/lib-version.csproj --no-restore --configuration Release -p:Version=${{ env.VERSION_CLEANED }} --output .
           dotnet nuget push *.nupkg --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate --no-symbols
 
       - name: Bump to next patch pre-release version
