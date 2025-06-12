@@ -13,7 +13,6 @@ lib-version/
 │   └── VersionUtil.cs       # Class to retrieve version
 ├── lib-version.tests/       # Unit tests for VersionUtil
 │   └── VersionTest.cs
-├── VERSION.txt              # Semantic version file
 ├── .github/workflows/       # CI/CD automation
 │   └── github-actions.yml   # Version tagging and pre-release bump
 └── lib-version.sln          # .NET Solution file
