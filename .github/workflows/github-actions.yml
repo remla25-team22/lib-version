@@ -58,6 +58,14 @@ jobs:
         run: |
           dotnet pack lib-version/lib-version.csproj --no-restore --configuration Release -p:Version=${{ env.VERSION_CLEANED }} --output .
           dotnet nuget push *.nupkg --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate --no-symbols
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump to next patch pre-release version
         run: |
