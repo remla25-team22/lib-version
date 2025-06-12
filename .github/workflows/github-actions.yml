@@ -1,16 +1,25 @@
-name: Test & Publish to GitHub Packages
+name: Test, Publish & Bump Version (.NET + GitHub Packages)
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -23,15 +32,40 @@ jobs:
       - name: Run tests
         run: dotnet test lib-version/lib-version.csproj --configuration Release
 
-  publish:
-    runs-on: ubuntu-latest
+      - name: Read version from VERSION.txt
+        id: version
+        run: |
+          VERSION=$(cat VERSION.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Current version: $VERSION"
 
-    steps:
-      - uses: actions/checkout@v4
-          
+      - name: Tag release if not exists
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/${{ env.VERSION }}"; then
+            echo "Tag already exists. Skipping release."
+            exit 0
+          fi
+          git tag ${{ env.VERSION }}
+          git push origin ${{ env.VERSION }}
+
       - name: Publish NuGet package to GitHub Packages
         uses: rollycodes/publish-nuget-private@v3.0.1
         with:
           PROJECT_FILE_PATH: lib-version/lib-version.csproj
           NUGET_KEY: ${{ secrets.GITHUB_TOKEN }}
           NUGET_SOURCE: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+      - name: Bump to next patch pre-release version
+        run: |
+          VERSION=${{ env.VERSION }}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${VERSION#v}"
+          NEXT_PATCH=$((PATCH + 1))
+          NEXT_VERSION="v${MAJOR}.${MINOR}.${NEXT_PATCH}-pre"
+          echo "$NEXT_VERSION" > VERSION.txt
+          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+
+      - name: Commit and push version bump
+        run: |
+          git add VERSION.txt
+          git commit -m "Bump version to ${{ env.NEXT_VERSION }} after release ${{ env.VERSION }}"
+          git push origin main
