@@ -1,14 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>net8.0</TargetFramework>
-	  <RootNamespace>lib_version</RootNamespace>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <Version>1.0.0</Version>
-	  <PackageId>lib-version</PackageId>
-	  <RepositoryUrl>https://github.com/remla25-team22/lib-version</RepositoryUrl>
-	  <Description>This library provides .NET versioning information for the Team 22 project.</Description>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>lib_version</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>1.0.0</Version>
+    <PackageId>lib-version</PackageId>
+    <RepositoryUrl>https://github.com/remla25-team22/lib-version</RepositoryUrl>
+    <Description>This library provides .NET versioning information for the Team 22 project.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+	<None Include="..\VERSION.txt">
+		<Link>VERSION.txt</Link>
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+  </ItemGroup>
 
 </Project>
