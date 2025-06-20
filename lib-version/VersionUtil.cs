@@ -1,6 +1,33 @@
-﻿namespace lib_version;
+﻿using System;
+using System.IO;
 
-public static class VersionUtil
+namespace lib_version
 {
-    public static Version? CurrentVersion { get; } = typeof(VersionUtil).Assembly.GetName().Version;
+    public static class VersionUtil
+    {
+        public static string CurrentVersion
+        {
+            get
+            {
+                try
+                {
+                    var baseDir = AppContext.BaseDirectory;
+                    var versionFile = Path.Combine(baseDir, "VERSION.txt");
+
+                    if (!File.Exists(versionFile))
+                    {
+                        versionFile = Path.Combine(baseDir, "..", "..", "..", "VERSION.txt");
+                    }
+
+                    return File.Exists(versionFile)
+                        ? File.ReadAllText(versionFile).Trim()
+                        : "unknown";
+                }
+                catch
+                {
+                    return "error-loading-version";
+                }
+            }
+        }
+    }
 }
